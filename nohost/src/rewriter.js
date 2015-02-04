@@ -1,5 +1,5 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, brackets, appshell, $ */
+/*global define, brackets, appshell, DOMParser */
 define(function (require, exports, module) {
     "use strict";
 
@@ -17,11 +17,14 @@ define(function (require, exports, module) {
         this.fs = fs;
         this.path = path;
         this.dir = Path.dirname(path);      
+        this.css = css;
     }
 
     CSSRewriter.prototype.urls = function(callback) {
         var fs = this.fs;
+        var path = this.path;
         var dir = this.dir;
+        var css = this.css;
 
         // Do a two stage pass of the css content, replacing all interesting url(...)
         // uses with the contents of files in the server root.
@@ -105,7 +108,7 @@ define(function (require, exports, module) {
         Async.eachSeries(elems, function(elem, callback) {
             // Skip any links for protocols (we only want relative paths)
             var url = elem.getAttribute(urlType);
-            if(!_isRelativeURL(url)) {
+            if(!Content.isRelativeURL(url)) {
                 return callback();
             }
 
@@ -136,6 +139,7 @@ define(function (require, exports, module) {
     HTMLRewriter.prototype.links = function(callback) {
         var dir = this.dir;
         var path = this.path;
+        var fs = this.fs;
         var elems = this.doc.querySelectorAll('link');
 
         Async.eachSeries(elems, function(elem, callback) {
@@ -180,6 +184,8 @@ define(function (require, exports, module) {
     };
 
     HTMLRewriter.prototype.styles = function(callback) {
+        var path = this.path;
+        var fs = this.fs;
         var elems = this.doc.querySelectorAll('style');
 
         Async.eachSeries(elems, function(elem, callback) {
@@ -205,6 +211,8 @@ define(function (require, exports, module) {
     };
 
     HTMLRewriter.prototype.styleAttributes = function(callback) {
+        var path = this.path;
+        var fs = this.fs;
         var elems = this.doc.querySelectorAll('[style]');
 
         Async.eachSeries(elems, function(elem, callback) {

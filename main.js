@@ -6,8 +6,8 @@ define(function (require, exports, module) {
     "use strict";
 
     var AppInit              = brackets.getModule("utils/AppInit"),
-        ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
         LiveDevServerManager = brackets.getModule("LiveDevelopment/LiveDevServerManager"),
+        PreferencesManager   = brackets.getModule("preferences/PreferencesManager"),
         ProjectManager       = brackets.getModule("project/ProjectManager"),
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
     

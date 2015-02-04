@@ -8,7 +8,6 @@ define(function (require, exports, module) {
     var Rewriter = require("nohost/src/rewriter");
 
     var Filer = appshell.MakeDrive;
-    var Path = Filer.Path;
 
     function handle404(url, callback) {
         var html = '<!DOCTYPE html>' +
@@ -45,7 +44,7 @@ define(function (require, exports, module) {
     /**
      * Send the raw file, making it somewhat more readable
      */
-    function handleFile(path, fs) {
+    function handleFile(path, fs, callback) {
         fs.readFile(path, 'utf8', function(err, data) {
             if(err) {
                 Log.error('unable to read `' + path + '`');
