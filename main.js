@@ -21,6 +21,11 @@ define(function (require, exports, module) {
     }
 
     AppInit.appReady(function () {
+        // Flip livedev.multibrowser to true
+        var prefs = PreferencesManager.getExtensionPrefs("livedev");
+        prefs.set("multibrowser", true);
+
+        // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _createServer }, 9001);
     });
     
