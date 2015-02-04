@@ -9,7 +9,7 @@ define(function (require, exports, module) {
         ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
         LiveDevServerManager = brackets.getModule("LiveDevelopment/LiveDevServerManager"),
         ProjectManager       = brackets.getModule("project/ProjectManager"),
-        NoHostServer         = require("nohost/NoHostServer").NoHostServer;
+        NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
     
     function _createServer() {
         var config = {
