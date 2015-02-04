@@ -5,8 +5,8 @@ define(function (require, exports, module) {
 
     var BaseServer  = brackets.getModule("LiveDevelopment/Servers/BaseServer").BaseServer;
 
-    var Content = require('content');
-    var Handlers = require('handlers');
+    var Content = require("nohost/src/content");
+    var Handlers = require("nohost/src/handlers");
 
     var Filer = appshell.MakeDrive;
     var Path = Filer.Path;

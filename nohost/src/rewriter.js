@@ -3,9 +3,9 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var Content = require('content');
-    var Log = require('log');
-    var Async = require('../lib/async');
+    var Content = require("nohost/src/content");
+    var Log = require("nohost/src/log");
+    var Async = require("nohost/lib/async");
 
     var Filer = appshell.MakeDrive;
     var Path = Filer.Path;

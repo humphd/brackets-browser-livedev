@@ -3,9 +3,9 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var Content = require('content');
-    var Log = require('log');
-    var Rewriter = require('rewriter');
+    var Content = require("nohost/src/content");
+    var Log = require("nohost/src/log");
+    var Rewriter = require("nohost/src/rewriter");
 
     var Filer = appshell.MakeDrive;
     var Path = Filer.Path;
