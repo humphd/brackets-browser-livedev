@@ -3,7 +3,7 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var BaseServer  = require("LiveDevelopment/Servers/BaseServer").BaseServer;
+    var BaseServer  = brackets.getModule("LiveDevelopment/Servers/BaseServer").BaseServer;
 
     var Content = require('content');
     var Handlers = require('handlers');
