@@ -6,9 +6,10 @@ define(function (require, exports, module) {
     "use strict";
 
     var AppInit              = brackets.getModule("utils/AppInit"),
-        ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
         LiveDevServerManager = brackets.getModule("LiveDevelopment/LiveDevServerManager"),
+        PreferencesManager   = brackets.getModule("preferences/PreferencesManager"),
         ProjectManager       = brackets.getModule("project/ProjectManager"),
+        browser              = require("browser/iframe-browser");
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
     
     function _createServer() {
@@ -27,6 +28,9 @@ define(function (require, exports, module) {
 
         // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _createServer }, 9001);
+
+        // Turn prevew iFrame On
+        browser.browse();
     });
     
 });
