@@ -7,6 +7,7 @@ define(function (require, exports, module) {
 
     var Content = require("nohost/src/content");
     var Handlers = require("nohost/src/handlers");
+    var Rewriter = require("nohost/src/rewriter");
 
     var Filer = appshell.MakeDrive;
     var Path = Filer.Path;
@@ -36,9 +37,11 @@ define(function (require, exports, module) {
     };
 
     /**
-     * Serve the contents of path, invoking the appropriate content handler.
+     * Serve the contents of a path into the filesystem,
+     * invoking the appropriate content handler, and rewriting any resources
+     * in the local filesystem to Blob URLs.
      */
-    NoHostServer.prototype.serve = function(path, callback) {
+    NoHostServer.prototype.servePath = function(path, callback) {
         var fs = this.fs;
 
         fs.stat(path, function(err, stats) {
@@ -59,6 +62,26 @@ define(function (require, exports, module) {
             } else {
                 Handlers.handleFile(path, fs, callback);
             }
+        });
+    };
+
+    /**
+     * Serve an existing HTML fragment/file (i.e., one that has already been read
+     * for a given path) from the local filesystem, rewriting any resources
+     * in the local filesystem to Blob URLs. The original path of the file is needed
+     * in order to locate other resources with paths relative to this file.
+     */
+    NoHostServer.prototype.serveHTML = function(html, path, callback) {
+        var fs = this.fs;
+
+        Rewriter.rewriteHTML(html, path, fs, function(err, rewrittenHTML) {
+            if(err) {
+                Log.error('unable to rewrite HTML for `' + path + '`');
+                // TODO: best way to deal with error here? 500?
+                return handle404(path, callback);
+            }
+
+            callback(null, rewrittenHTML);
         });
     };
 
