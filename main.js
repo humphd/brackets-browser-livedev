@@ -29,7 +29,7 @@ define(function (require, exports, module) {
         // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _createServer }, 9001);
 
-        // Turn prevew iFrame On
+        // Turn preview iFrame On
         browser.browse();
     });
     
