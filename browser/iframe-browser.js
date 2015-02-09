@@ -21,22 +21,36 @@ define(function (require, exports, module) {
 
         // If iframe does not exist, then show it
         if(result.rows === 1 && result.columns === 1) {
-            setOrientation(_orientation);
+            _show(_orientation);
         }
         // Call function that is used to create the iframe and fill it with url
         _update(url);
     }
 
     /*
-     * Publicly available function used to change the orientation of the panel
+     * Publicly available function used to change the _orientation value of iframe-browser
      * orientation: Takes one argument of either VERTICAL_ORIENTATION OR
-     * HORIZONTAL_ORIENTATION and uses that to change the layout accordingly
+     * HORIZONTAL_ORIENTATION and uses that to change the _orientation value accordingly
      */
     function setOrientation(orientation) {
         if(orientation === VERTICAL_ORIENTATION) {
-            CommandManager.execute(Commands.CMD_SPLITVIEW_VERTICAL);
+            _orientation = VERTICAL_ORIENTATION;
         }
         else if (orientation === HORIZONTAL_ORIENTATION) {
+            _orientation = HORIZONTAL_ORIENTATION;
+        }
+    }
+
+    /*
+     * Publicly available function used to change the layout of the iFrame
+     * orientation: Takes one argument of either VERTICAL_ORIENTATION OR
+     * HORIZONTAL_ORIENTATION and uses that to change the layout accordingly
+     */
+    function show() {
+        if(_orientation === VERTICAL_ORIENTATION) {
+            CommandManager.execute(Commands.CMD_SPLITVIEW_VERTICAL);
+        }
+        else if(_orientation === HORIZONTAL_ORIENTATION) {
             CommandManager.execute(Commands.CMD_SPLITVIEW_HORIZONTAL);
         }
     }
@@ -72,6 +86,7 @@ define(function (require, exports, module) {
 
     // Define public API
     exports.browse = browse;
+    exports.show = show;
     exports.getBrowserIFrame = getBrowserIFrame;
     // Expose these constants on our module, so callers can use them with setOrientation()
     exports.HORIZONTAL_ORIENTATION = HORIZONTAL_ORIENTATION;
