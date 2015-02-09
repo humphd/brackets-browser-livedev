@@ -1,6 +1,3 @@
-/*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, brackets, $*/
-
 define(function (require, exports, module) {
     "use strict";
 
@@ -13,12 +10,13 @@ define(function (require, exports, module) {
 
 
     /*
-     * Function that manages intialial arguments
-     * url refers to the html we will be using to fill the second iframe
-     * if url is empty, then we'll still display the iFrame, we just won't fill in the src
-     * While vertical refers to which format the second iFrame will take, either vertical or horizontal
-     * If vert is undefined then we'll default to  either showing vertical panel, 
-     *      or updating the current content of the second iframe
+     * Function that manages initial arguments
+     * html: We are expecting the user to send us a packaged blob object for use
+     *      if undefined we will not fill the iframe with an src
+     * vertical: We are expecting a boolean value, true for vert, false for horizontal
+     *      if vertical, we will display the sidepanel vertically with the html sent
+     *      if horizontal, we will display the sidepanel horizontally with the html sent
+     *      if undefinied, we will default to vertical layout
      */
     function browse(html, vertical) {
         /*
@@ -26,6 +24,12 @@ define(function (require, exports, module) {
          *result has 2 values in it, row and column
          *these together will help us get what kind of layout the application is currenlty in
          */
+
+         /*
+          * Retrieving Current Layout State
+          *     Will return 2 values, row and column
+          *     These refer to the current layout state, (no split, split vert, split hori)
+          */
         var result = MainViewManager.getLayoutScheme();
         //If undefined do some checking to figure out what to do
         if(vertical === undefined) {
@@ -72,7 +76,7 @@ define(function (require, exports, module) {
 
     /**
      * Function used to fill the iFrame with a blob
-     * Takes in html with text! require statement
+     * Takes in a blob object, and uses it as the iFrames src
      */
     function update(r_url) {
         //Empty the Second Pane for use
@@ -86,8 +90,7 @@ define(function (require, exports, module) {
         }
         //If we were sent data, then put that in the iFrame
         else {
-            var blob    = new Blob([r_url], {type: "text/html"});
-            var url     = URL.createObjectURL(blob);
+            var url     = URL.createObjectURL(r_url);
             $("<iframe>", {
                 src: url,
                 id:  "bramble-iframe-browser",
