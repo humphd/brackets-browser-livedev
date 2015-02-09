@@ -78,11 +78,11 @@ define(function (require, exports, module) {
      * Function used to fill the iFrame with a blob
      * Takes in a blob object, and uses it as the iFrames src
      */
-    function update(r_url) {
+    function update(url) {
         //Empty the Second Pane for use
         _panel      = $("#second-pane").empty();
         //If we were not sent any data in r_url, merely make the iFrame
-        if(r_url === undefined) {
+        if(url === undefined) {
             $("<iframe>", {
                 id:  "bramble-iframe-browser",
                 frameborder: 0,
@@ -90,9 +90,9 @@ define(function (require, exports, module) {
         }
         //If we were sent data, then put that in the iFrame
         else {
-            var url     = URL.createObjectURL(r_url);
+            var urlObj     = URL.createObjectURL(url);
             $("<iframe>", {
-                src: url,
+                src: urlObj,
                 id:  "bramble-iframe-browser",
                 frameborder: 0,
             }).css({ "width":"100%", "height":"100%" }).appendTo(_panel);
