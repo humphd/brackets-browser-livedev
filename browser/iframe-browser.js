@@ -10,11 +10,10 @@ define(function (require, exports, module) {
     // by default we use vertical orientation
     var _orientation = VERTICAL_ORIENTATION;
 
-
     /*
-     * Function that manages initial arguments
-     * html: We are expecting the user to send us a url to the blob for use
-     *      if undefined we will not fill the iframe with an src
+     * Publicly avaialble function used to create an iframe within the second-panel
+     * url: Takes one argument of a url to a blob for the _update() function to use 
+     *      - if undefined we will not fill the iframe with an src
      */
     function browse(url) {
         //Get current GUI layout
@@ -24,12 +23,14 @@ define(function (require, exports, module) {
         if(result.rows === 1 && result.columns === 1) {
             setOrientation(_orientation);
         }
-        // Fill the iframe with data
+        // Call function that is used to create the iframe and fill it with url
         _update(url);
     }
 
     /*
-     * Allows us to set the layout independent of the other functions
+     * Publicly available function used to change the orientation of the panel
+     * orientation: Takes one argument of either VERTICAL_ORIENTATION OR
+     * HORIZONTAL_ORIENTATION and uses that to change the layout accordingly
      */
     function setOrientation(orientation) {
         if(orientation === VERTICAL_ORIENTATION) {
@@ -41,20 +42,21 @@ define(function (require, exports, module) {
     }
 
     /**
-     * Function used to fill the iFrame with a url
-     * Takes in a url, and uses it as the iFrames src
+     * Function used to interact with the second-pane
+     * In which our iFrame will exists and will be filled
+     * with the url that has been passed to this function
      */
     function _update(url) {
-        //Empty the Second Pane for use
+        // Empty all contents of #second-pane
         var _panel = $("#second-pane").empty();
 
-        // Make the iframe for the blob to live in
+        // Create the iFrame for the blob to live in
         var iframeConfig = {
             id: "bramble-iframe-browser",
             frameborder: 0
         };
 
-        //If we were sent data, then make the iFrames' src of the url
+        // If url has been sent, make the iFrames' src that of the url
         if(url) {
             iframeConfig.src = url;
         }
@@ -70,9 +72,10 @@ define(function (require, exports, module) {
 
     // Define public API
     exports.browse = browse;
-    exports.setOrientation = setOrientation;
+    exports.getBrowserIFrame = getBrowserIFrame;
     // Expose these constants on our module, so callers can use them with setOrientation()
     exports.HORIZONTAL_ORIENTATION = HORIZONTAL_ORIENTATION;
     exports.VERTICAL_ORIENTATION = VERTICAL_ORIENTATION;
-    exports.getBrowserIFrame = getBrowserIFrame;
+    exports.setOrientation = setOrientation;
+    
 });
