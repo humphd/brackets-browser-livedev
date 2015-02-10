@@ -73,7 +73,6 @@ define(function (require, exports, module) {
     function update(url) {
         // If url has been sent, make the iFrames' src that of the url
         if(url) {
-            //iframeConfig.src = url;
             var $iframe = $("#bramble-iframe-browser");
             if ( $iframe.length ) {
                 $iframe.attr('src',url);
