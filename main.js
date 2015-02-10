@@ -2,6 +2,11 @@
 maxerr: 50, browser: true */
 /*global define, brackets */
 
+/**
+ * This extension provides in-editor livepreview through an iframe,
+ * and leverages the experimental Multi Browser implementation of brackets
+ * (see https://github.com/adobe/brackets/tree/master/src/LiveDevelopment/MultiBrowserImpl)
+ */
 define(function (require, exports, module) {
     "use strict";
 
@@ -11,58 +16,58 @@ define(function (require, exports, module) {
         ProjectManager       = brackets.getModule("project/ProjectManager"),
         browser              = require("lib/iframe-browser");
         LiveDevelopment      = brackets.getModule("LiveDevelopment/LiveDevMultiBrowser"),
-        // PostMessageTransport = require("LiveDevelopment/MultiBrowserImpl/transports/PostMessageTransport"),
+        PostMessageTransport = require("lib/PostMessageTransport"),
+        Launcher             = require("lib/Launcher"),
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
 
-    function _createServer() {
-        var config = {
-            pathResolver    : ProjectManager.makeProjectRelativeIfPossible,
-            root            : ProjectManager.getProjectRoot().fullPath
-        };
+    var _server = new NoHostServer({
+        pathResolver    : ProjectManager.makeProjectRelativeIfPossible,
+        root            : ProjectManager.getProjectRoot().fullPath
+    });
 
-        return new NoHostServer(config);
+    function _getServer() {
+        return _server;
     }
 
-    function _configureIframeForUse() {
-        // Set transport
-            // PostMessageTransport.setIframe(browser.getIframe());
-            // LiveDevelopment.setTransport(PostMessageTransport);
-    }
-    LiveDevelopment.one("statusChange", _configureIframeForUse);
-
-    function _beginLivePreview() {
-        // LiveDevelopment.open()
-    }
-    ProjectManager.one("projectOpen", _beginLivePreview);
-
+    // First, we configure brackets to run the experimental live dev
+    // with our nohost server and iframe combination. This has to
+    // occur before the project is loaded, triggering the start of
+    // the live preview.
     AppInit.extensionsLoaded(function () {
         // Flip livedev.multibrowser to true
         var prefs = PreferencesManager.getExtensionPrefs("livedev");
         prefs.set("multibrowser", true);
 
         // Register nohost server with highest priority
-        LiveDevServerManager.registerServer({ create: _createServer }, 9001);
+        LiveDevServerManager.registerServer({ create: _getServer }, 9001);
 
         // Turn preview iFrame On
-        browser.browse();
+        browser.init();
     });
 
-        // XXXnote: This block of code will need to live in a Launcher of some
-        //          kind. It appears like the Brackets team were wanting to
-        //          add multiple launchers, which would make sense for multiple
-        //          transports. We might want to consider patching LiveDevMultBrowser
-        //          to allow setting the launcher as well as the transport, and adding
-        //          a launcher of our own rather than hacking on theirs.
+    // Next, we wait until the LiveDevelopment module is initialized
+    // so we can safely swap our transport and launcher modules for
+    // the defaults.
+    function _configureLiveDev() {
+        // Set up our transport and plug it into live-dev
+        PostMessageTransport.setIframe(browser.getBrowserIframe());
+        LiveDevelopment.setTransport(PostMessageTransport);
 
-        // // send instrumented response or null to fallback to static file
-        // if (liveDocument && liveDocument.getResponseData) {
-        //     response = liveDocument.getResponseData();
-        // } else {
-        //     response = {};  // let server fall back on loading file off disk
-        // }
-        // response.id = request.id;
+        // Set up our launcher in a similar manner
+        LiveDevelopment.setLauncher(new Launcher({
+            browser: browser,
+            server: _server
+        }));
 
-        // this._send(request.location, response);
-
-
+        // Lastly, we wait for brackets to open our project as the last step in
+        // its loading process.  At this point, we have already configured live preview
+        // to use an iframe instead of a browser, and we have ensured that
+        // a file exists to be opened as a project. Once it's opened, we can
+        // start the live preview.
+        function _beginLivePreview() {
+            LiveDevelopment.open();
+        }
+        ProjectManager.one("projectOpen", _beginLivePreview);
+    }
+    LiveDevelopment.one("statusChange", _configureLiveDev);
 });

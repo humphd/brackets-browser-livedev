@@ -85,5 +85,32 @@ define(function (require, exports, module) {
         });
     };
 
+    /**
+     * If a livedoc exists, serves the instrumented version of the file as as a blob URL.
+     * Otherwise, it serves only the file's contents as a blob URL.
+     */
+    NoHostServer.prototype.maybeServeLiveDoc = function(path, callback) {
+        var fs = this.fs;
+        var liveDocument = this._liveDocuments[path];
+
+        function toURL(err, html) {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            // Convert rewritten HTML to a Blob URL Object
+            var url = Content.toURL(html, 'text/html');
+            callback(null, url);
+        }
+
+        // If we have a LiveDoc for this path, send instrumented response. Otherwise fallback to static file from fs
+        if (liveDocument && liveDocument.getResponseData) {
+          Rewriter.rewriteHTML(liveDocument.getResponseData(), path, fs, toURL);
+        } else {
+          fs.readFile(path, 'utf8', toURL);
+        }
+    };
+
     exports.NoHostServer = NoHostServer;
 });
