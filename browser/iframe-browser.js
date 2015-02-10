@@ -15,6 +15,10 @@ define(function (require, exports, module) {
      * Publicly avaialble function used to create an empty iframe within the second-panel
      */
     function init() {
+        //Check to see if we've created the iframe already, return if so
+        if(getBrowserIFrame()) {
+            return;
+        }
         //Get current GUI layout
         var result = MainViewManager.getLayoutScheme();
 
@@ -73,9 +77,12 @@ define(function (require, exports, module) {
     function update(url) {
         // If url has been sent, make the iFrames' src that of the url
         if(url) {
-            var $iframe = $("#bramble-iframe-browser");
-            if ( $iframe.length ) {
-                $iframe.attr('src',url);
+            //Get the iframe
+            var iframe = getBrowserIFrame();
+            //Check to make sure it exists
+            if(iframe) {
+                //Set its src as url
+                iframe.src = url;
             }
         }
     }
