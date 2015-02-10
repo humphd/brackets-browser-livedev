@@ -10,21 +10,35 @@ define(function (require, exports, module) {
     // by default we use vertical orientation
     var _orientation = VERTICAL_ORIENTATION;
 
+
     /*
-     * Publicly avaialble function used to create an iframe within the second-panel
-     * url: Takes one argument of a url to a blob for the _update() function to use 
-     *      - if undefined we will not fill the iframe with an src
+     * Publicly avaialble function used to create an empty iframe within the second-panel
      */
-    function browse(url) {
+    function init() {
+        //Check to see if we've created the iframe already, return if so
+        if(getBrowserIFrame()) {
+            return;
+        }
         //Get current GUI layout
         var result = MainViewManager.getLayoutScheme();
 
         // If iframe does not exist, then show it
         if(result.rows === 1 && result.columns === 1) {
-            _show(_orientation);
+            show(_orientation);
         }
-        // Call function that is used to create the iframe and fill it with url
-        _update(url);
+        /*
+         *Creating the empty iFrame we'll be using
+         * Starting by Emptying all contents of #second-pane
+         */
+        var _panel = $("#second-pane").empty();
+
+        // Create the iFrame for the blob to live in later
+        var iframeConfig = {
+            id: "bramble-iframe-browser",
+            frameborder: 0
+        };
+        //Append iFrame to _panel
+        $("<iframe>", iframeConfig).css({"width":"100%", "height":"100%"}).appendTo(_panel);
     }
 
     /*
@@ -60,23 +74,13 @@ define(function (require, exports, module) {
      * In which our iFrame will exists and will be filled
      * with the url that has been passed to this function
      */
-    function _update(url) {
-        // Empty all contents of #second-pane
-        var _panel = $("#second-pane").empty();
-
-        // Create the iFrame for the blob to live in
-        var iframeConfig = {
-            id: "bramble-iframe-browser",
-            frameborder: 0
-        };
-
-        // If url has been sent, make the iFrames' src that of the url
+    function update(url) {
         if(url) {
-            iframeConfig.src = url;
+            var iframe = getBrowserIFrame();
+            if(iframe) {
+                iframe.src = url;
+            }
         }
-
-        //Append iFrame to _panel
-        $("<iframe>", iframeConfig).css({"width":"100%", "height":"100%"}).appendTo(_panel);
     }
 
     // Return reference to iframe element or null if not available.
@@ -85,7 +89,8 @@ define(function (require, exports, module) {
     }
 
     // Define public API
-    exports.browse = browse;
+    exports.init = init;
+    exports.update = update;
     exports.show = show;
     exports.getBrowserIFrame = getBrowserIFrame;
     // Expose these constants on our module, so callers can use them with setOrientation()
