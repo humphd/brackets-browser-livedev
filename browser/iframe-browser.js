@@ -75,13 +75,9 @@ define(function (require, exports, module) {
      * with the url that has been passed to this function
      */
     function update(url) {
-        // If url has been sent, make the iFrames' src that of the url
         if(url) {
-            //Get the iframe
             var iframe = getBrowserIFrame();
-            //Check to make sure it exists
             if(iframe) {
-                //Set its src as url
                 iframe.src = url;
             }
         }
