@@ -6,7 +6,8 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var _iframeRef;
+    var _iframeRef,
+        connId = 1;
     
     var EventDispatcher = require("utils/EventDispatcher");
     
@@ -35,13 +36,10 @@ define(function (require, exports, module) {
             console.error("PostMessageTransport: Error parsing message: " + event.data);
             return;
         }
-        
-        if(msgObj.type === "connect"){
-            //trigger connect event
-            exports.emitEvent("PostMessageTransport", "connect", [1, msgObj.url]);
-        } else if(msgObj.type === "message"){
+
+        if(msgObj.type === "message"){
             //trigger message event
-            exports.emitEvent("PostMessageTransport", "message", [1, msgObj.message]);
+            exports.emitEvent("PostMessageTransport", "message", [connId, msgObj.message]);
         }
     }
 
@@ -51,11 +49,11 @@ define(function (require, exports, module) {
     function start(){
         var win = _iframeRef.contentWindow;
 
-        _iframeRef.on("load", function() {
-            win.postMessage("initial message", "*");
-        });
+        win.postMessage("initial message", "*");
 
         window.addEventListener("message", _listener);
+
+        exports.emitEvent("PostMessageTransport", "connect", [connId, "fakeURL"]);
     }
 
     /**
@@ -66,10 +64,7 @@ define(function (require, exports, module) {
     function send(idOrArray, msgStr){
         var win = _iframeRef.contentWindow;
 
-        win.postMessage(
-        msgStr,
-        "*"
-        );
+        win.postMessage(msgStr,"*");
     }
 
     /**
