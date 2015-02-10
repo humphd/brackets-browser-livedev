@@ -32,5 +32,5 @@ define(function (require, exports, module) {
     }
 
     // Define public API
-    exports.Launcher;
+    exports.Launcher = Launcher;
 });

@@ -14,10 +14,10 @@ define(function (require, exports, module) {
         LiveDevServerManager = brackets.getModule("LiveDevelopment/LiveDevServerManager"),
         PreferencesManager   = brackets.getModule("preferences/PreferencesManager"),
         ProjectManager       = brackets.getModule("project/ProjectManager"),
-        browser              = require("lib/iframe-browser");
+        Browser              = require("lib/iframe-browser"),
         LiveDevelopment      = brackets.getModule("LiveDevelopment/LiveDevMultiBrowser"),
         PostMessageTransport = require("lib/PostMessageTransport"),
-        Launcher             = require("lib/Launcher"),
+        Launcher             = require("lib/Launcher").Launcher,
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
 
     var _server = new NoHostServer({
@@ -42,7 +42,7 @@ define(function (require, exports, module) {
         LiveDevServerManager.registerServer({ create: _getServer }, 9001);
 
         // Turn preview iFrame On
-        browser.init();
+        Browser.init();
     });
 
     // Next, we wait until the LiveDevelopment module is initialized
@@ -50,12 +50,12 @@ define(function (require, exports, module) {
     // the defaults.
     function _configureLiveDev() {
         // Set up our transport and plug it into live-dev
-        PostMessageTransport.setIframe(browser.getBrowserIframe());
+        PostMessageTransport.setIframe(Browser.getBrowserIframe());
         LiveDevelopment.setTransport(PostMessageTransport);
 
         // Set up our launcher in a similar manner
         LiveDevelopment.setLauncher(new Launcher({
-            browser: browser,
+            Browser: Browser,
             server: _server
         }));
 
