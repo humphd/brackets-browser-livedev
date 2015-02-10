@@ -11,52 +11,51 @@ define(function (require, exports, module) {
     var EventDispatcher = require("utils/EventDispatcher");
     
     // The script that will be injected into the previewed HTML to handle the other side of the post message connection.
-    var PostMessageTransportRemote = require("text!PostMessageTransportRemote.js");
+    var PostMessageTransportRemote = require("text!lib/PostMessageTransportRemote.js");
 
     EventDispatcher.makeEventDispatcher(exports);
     
     /**
      * Saves a reference of the iframe element to a local variable
-     * @param {jQuery reference}
+     * @param {DOM element reference to an iframe}
      */
-    function setIframe($ref){
-        if($ref)
-            _iframeRef = $ref;
+    function setIframe(iframeRef){
+        if(iframeRef)
+            _iframeRef = iframeRef;
+    }
+
+    /**
+    * Message event listener
+    */
+    function _listener(event){
+        var msgObj;
+        try {
+            msgObj = JSON.parse(event.data);
+        } catch (e) {
+            console.error("PostMessageTransport: Error parsing message: " + event.data);
+            return;
+        }
+        
+        if(msgObj.type === "connect"){
+            //trigger connect event
+            exports.emitEvent("PostMessageTransport", "connect", [1, msgObj.url]);
+        } else if(msgObj.type === "message"){
+            //trigger message event
+            exports.emitEvent("PostMessageTransport", "message", [1, msgObj.message]);
+        }
     }
 
     /**
     * Initializes the post message connection
     */
     function start(){
-        var win = _iframeRef.get(0).contentWindow;
+        var win = _iframeRef.contentWindow;
 
         _iframeRef.on("load", function() {
             win.postMessage("initial message", "*");
         });
 
-        window.addEventListener("message", function(event){
-            var msgObj;
-            try {
-                msgObj = JSON.parse(event.data);
-            } catch (e) {
-                console.error("PostMessageTransport: Error parsing message: " + event.data);
-                return;
-            }
-            
-            if(msgObj.type === "connect"){
-                if (!msgObj.url) {
-                console.error("PostMessageTransport: Malformed connect message: " + event.data);
-                return;
-                }
-
-                //trigger connect event
-                exports.emitEvent("PostMessageTransport", "connect", [1, msgObj.url]);
-            }else if(msgObj.type === "message"){
-
-                //trigger message event
-                exports.emitEvent("PostMessageTransport", "message", [1, msgObj.message]);
-            }
-        });
+        window.addEventListener("message", _listener);
     }
 
     /**
@@ -65,20 +64,19 @@ define(function (require, exports, module) {
      * @param {string} msgStr The message to send as a JSON string.
      */
     function send(idOrArray, msgStr){
-        var win = _iframeRef.get(0).contentWindow;
-        _iframeRef.on("load", function() {
-            win.postMessage(
-            msgStr,
-            "*"
-            );
-        });
+        var win = _iframeRef.contentWindow;
+
+        win.postMessage(
+        msgStr,
+        "*"
+        );
     }
 
     /**
-    * Closes the connection
+    * Removes the message event listener
     */
     function close(clientId){
-        //empty
+        window.removeEventListener("message", _listener);
     }
 
     /**
