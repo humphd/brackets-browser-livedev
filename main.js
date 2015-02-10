@@ -9,7 +9,7 @@ define(function (require, exports, module) {
         LiveDevServerManager = brackets.getModule("LiveDevelopment/LiveDevServerManager"),
         PreferencesManager   = brackets.getModule("preferences/PreferencesManager"),
         ProjectManager       = brackets.getModule("project/ProjectManager"),
-        browser              = require("browser/iframe-browser");
+        browser              = require("lib/iframe-browser");
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
     
     function _createServer() {
