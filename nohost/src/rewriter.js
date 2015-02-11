@@ -239,28 +239,25 @@ define(function (require, exports, module) {
 
     function rewriteHTML(html, path, fs, callback) {
         var rewriter = new HTMLRewriter(fs, path, html);
-        Async.series([
-            rewriter.links,
-            rewriter.styles,
-            rewriter.styleAttributes,
-            function(callback) {
-                rewriter.elements('iframe', 'src', null, callback);
-            },
-            function(callback) {
-                rewriter.elements('img', 'src', null, callback);
-            },
-            function(callback) {
-                rewriter.elements('script', 'src', 'text/javascript', callback);
-            },
-            function(callback) {
-                rewriter.elements('source', 'src', null, callback);
-            },
-            function(callback) {
-                rewriter.elements('video', 'src', null, callback);
-            },
-            function(callback) {
-                rewriter.elements('audio', 'src', null, callback);
+
+        function iterator(functionName) {
+            var args = Array.prototype.slice.call(arguments, 1);
+
+            return function (callback) {
+                rewriter[functionName].apply(rewriter, args.concat([callback]));
             }
+        }
+
+        Async.series([
+            iterator("links"),
+            iterator("styles"),
+            iterator("styleAttributes"),
+            iterator("elements", 'iframe', 'src', null),
+            iterator("elements", 'img', 'src', null),
+            iterator("elements", 'script', 'src', 'text/javascript'),
+            iterator("elements", 'source', 'src', null),
+            iterator("elements", 'video', 'src', null),
+            iterator("elements", 'audio', 'src', null),
         ], function finishedRewriteSeries(err, result) {
             // Return the processed HTML
             var html = rewriter.doc.documentElement.innerHTML;
