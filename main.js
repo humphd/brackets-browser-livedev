@@ -39,18 +39,21 @@ define(function (require, exports, module) {
         // Turn preview iFrame On
         Browser.init();
 
-        // Set up our transport and plug it into live-dev
-        PostMessageTransport.setIframe(Browser.getBrowserIframe());
-        LiveDevelopment.setTransport(PostMessageTransport);
+        function _configureModules() {
+            // Set up our transport and plug it into live-dev
+            PostMessageTransport.setIframe(Browser.getBrowserIframe());
+            LiveDevelopment.setTransport(PostMessageTransport);
 
-        // Set up our launcher in a similar manner
-        // XXXhumph - this depends on setLauncher() from https://github.com/adobe/brackets/pull/10558
-        LiveDevelopment.setLauncher(new Launcher({
-            browser: Browser,
-            server: _getServer()
-        }));
+            // Set up our launcher in a similar manner
+            // XXXhumph - this depends on setLauncher() from https://github.com/adobe/brackets/pull/10558
+            LiveDevelopment.setLauncher(new Launcher({
+                browser: Browser,
+                server: _getServer()
+            }));
 
-        LiveDevelopment.open();
+            LiveDevelopment.open();
+        }
+        LiveDevelopment.one("statusChange", _configureModules);
     }
     ProjectManager.one("projectOpen", _configureLiveDev);
 
