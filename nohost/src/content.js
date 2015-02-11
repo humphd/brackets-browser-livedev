@@ -3,7 +3,7 @@
 define(function (require, exports, module) {
     "use strict";
     
-    exports = {
+    module.exports = {
         isMedia: function(ext) {
             return ext === '.avi'  ||
                    ext === '.mpeg' ||
