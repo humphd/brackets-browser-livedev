@@ -97,7 +97,7 @@ define(function (require, exports, module) {
 
         // Turn this html into a DOM, process it
         var parser = new DOMParser();
-        this.doc = parser.parseFromString(html.body, 'text/html');
+        this.doc = parser.parseFromString(html, 'text/html');
     }
 
     HTMLRewriter.prototype.elements = function(type, urlType, mime, callback) {
