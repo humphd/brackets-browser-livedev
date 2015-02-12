@@ -106,7 +106,7 @@ define(function (require, exports, module) {
 
         // If we have a LiveDoc for this path, send instrumented response. Otherwise fallback to static file from fs
         if (liveDocument && liveDocument.getResponseData) {
-          Rewriter.rewriteHTML(liveDocument.getResponseData(), path, fs, toURL);
+          Rewriter.rewriteHTML(liveDocument.getResponseData().body, path, fs, toURL);
         } else {
           fs.readFile(path, 'utf8', toURL);
         }
