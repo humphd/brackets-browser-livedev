@@ -36,6 +36,14 @@ define(function (require, exports, module) {
         this.fs = null;
     };
 
+    NoHostServer.prototype.add = function (liveDocument) {
+        if (liveDocument.setInstrumentationEnabled) {
+            // enable instrumentation
+            liveDocument.setInstrumentationEnabled(true);
+        }
+        BaseServer.prototype.add.call(this, liveDocument);
+    };
+
     /**
      * Serve the contents of a path into the filesystem,
      * invoking the appropriate content handler, and rewriting any resources
@@ -106,6 +114,7 @@ define(function (require, exports, module) {
 
         // If we have a LiveDoc for this path, send instrumented response. Otherwise fallback to static file from fs
         if (liveDocument && liveDocument.getResponseData) {
+          var test = liveDocument.getResponseData();
           Rewriter.rewriteHTML(liveDocument.getResponseData().body, path, fs, toURL);
         } else {
           fs.readFile(path, 'utf8', toURL);

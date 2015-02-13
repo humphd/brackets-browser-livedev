@@ -20,16 +20,44 @@ define(function (require, exports, module) {
         Launcher             = require("lib/Launcher").Launcher,
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
 
-    var _server = new NoHostServer({
-        pathResolver    : ProjectManager.makeProjectRelativeIfPossible,
-        root            : ProjectManager.getProjectRoot().fullPath
-    });
+    var _server;
 
     function _getServer() {
+        if (!_server) {
+            _server = new NoHostServer({
+                pathResolver    : ProjectManager.makeProjectRelativeIfPossible,
+                root            : ProjectManager.getProjectRoot()
+            });
+        }
         return _server;
     }
 
-    // First, we configure brackets to run the experimental live dev
+    // We wait until the LiveDevelopment module is initialized and the project loaded
+    // so we can safely swap our transport and launcher modules for
+    // the defaults and start LiveDev.
+    function _configureLiveDev() {
+        // Turn preview iFrame On
+        Browser.init();
+
+        function _configureModules() {
+            // Set up our transport and plug it into live-dev
+            PostMessageTransport.setIframe(Browser.getBrowserIFrame());
+            LiveDevelopment.setTransport(PostMessageTransport);
+
+            // Set up our launcher in a similar manner
+            // XXXhumph - this depends on setLauncher() from https://github.com/adobe/brackets/pull/10558
+            LiveDevelopment.setLauncher(new Launcher({
+                browser: Browser,
+                server: _getServer()
+            }));
+
+            LiveDevelopment.open();
+        }
+        LiveDevelopment.one("statusChange", _configureModules);
+    }
+    ProjectManager.one("projectOpen", _configureLiveDev);
+
+    // We configure Brackets to run the experimental live dev
     // with our nohost server and iframe combination. This has to
     // occur before the project is loaded, triggering the start of
     // the live preview.
@@ -40,34 +68,5 @@ define(function (require, exports, module) {
 
         // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _getServer }, 9001);
-
-        // Turn preview iFrame On
-        Browser.init();
     });
-
-    // Next, we wait until the LiveDevelopment module is initialized
-    // so we can safely swap our transport and launcher modules for
-    // the defaults.
-    function _configureLiveDev() {
-        // Set up our transport and plug it into live-dev
-        PostMessageTransport.setIframe(Browser.getBrowserIframe());
-        LiveDevelopment.setTransport(PostMessageTransport);
-
-        // Set up our launcher in a similar manner
-        LiveDevelopment.setLauncher(new Launcher({
-            Browser: Browser,
-            server: _server
-        }));
-
-        // Lastly, we wait for brackets to open our project as the last step in
-        // its loading process.  At this point, we have already configured live preview
-        // to use an iframe instead of a browser, and we have ensured that
-        // a file exists to be opened as a project. Once it's opened, we can
-        // start the live preview.
-        function _beginLivePreview() {
-            LiveDevelopment.open();
-        }
-        ProjectManager.one("projectOpen", _beginLivePreview);
-    }
-    LiveDevelopment.one("statusChange", _configureLiveDev);
 });
