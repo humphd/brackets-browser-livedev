@@ -37,6 +37,18 @@ define(function (require, exports, module) {
     };
 
     /**
+     * When a livedocument is added to the server cache, make sure live
+     * instrumentation is enabled
+     */
+    NoHostServer.prototype.add = function (liveDocument) {
+        if (liveDocument.setInstrumentationEnabled) {
+            // enable instrumentation
+            liveDocument.setInstrumentationEnabled(true);
+        }
+        BaseServer.prototype.add.call(this, liveDocument);
+    };
+
+    /**
      * Serve the contents of a path into the filesystem,
      * invoking the appropriate content handler, and rewriting any resources
      * in the local filesystem to Blob URLs.
