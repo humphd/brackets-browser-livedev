@@ -7,7 +7,7 @@ define(function (require, exports, module) {
     var Log = require("nohost/src/log");
     var Async = require("nohost/lib/async");
 
-    var Filer = appshell.MakeDrive;
+    var Filer = appshell.Filer;
     var Path = Filer.Path;
 
     /**
@@ -16,7 +16,7 @@ define(function (require, exports, module) {
     function CSSRewriter(fs, path, css) {
         this.fs = fs;
         this.path = path;
-        this.dir = Path.dirname(path);      
+        this.dir = Path.dirname(path);
         this.css = css;
     }
 

@@ -9,7 +9,7 @@ define(function (require, exports, module) {
     var Handlers = require("nohost/src/handlers");
     var Rewriter = require("nohost/src/rewriter");
 
-    var Filer = appshell.MakeDrive;
+    var Filer = appshell.Filer;
     var Path = Filer.Path;
 
     function NoHostServer(config) {
