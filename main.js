@@ -72,11 +72,7 @@ define(function (require, exports, module) {
         //Listen for paste event and run _configureLiveDev()
         var myElement = document.getElementById("first-pane");
         myElement.onpaste = function(e) {
-          if (window.clipboardData) { // IE
             _configureLiveDev();
-          } else if (e.clipboardData) {
-            _configureLiveDev();
-          }
 
           return true; // Allows the default handler to run.
         };
