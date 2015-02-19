@@ -8,6 +8,7 @@ define(function (require, exports, module) {
     var Content = require("nohost/src/content");
     var Handlers = require("nohost/src/handlers");
     var Rewriter = require("nohost/src/rewriter");
+    var Log = require("nohost/src/log");
 
     var Filer = appshell.Filer;
     var Path = Filer.Path;
@@ -90,7 +91,7 @@ define(function (require, exports, module) {
             if(err) {
                 Log.error('unable to rewrite HTML for `' + path + '`');
                 // TODO: best way to deal with error here? 500?
-                return handle404(path, callback);
+                return Handlers.handle404(path, callback);
             }
 
             callback(null, rewrittenHTML);
