@@ -7,8 +7,6 @@ define(function (require, exports, module) {
     var Log = require("nohost/src/log");
     var Rewriter = require("nohost/src/rewriter");
 
-    var Filer = appshell.MakeDrive;
-
     function handle404(url, callback) {
         var html = '<!DOCTYPE html>' +
                    '<html><head>' +
