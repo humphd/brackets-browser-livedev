@@ -260,7 +260,7 @@ define(function (require, exports, module) {
             iterator("elements", 'audio', 'src', null),
         ], function finishedRewriteSeries(err, result) {
             // Return the processed HTML
-            var html = rewriter.doc.documentElement.innerHTML;
+            var html = rewriter.doc.documentElement.outerHTML;
             callback(err, html);
         });
     }
