@@ -68,5 +68,13 @@ define(function (require, exports, module) {
 
         // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _getServer }, 9001);
+
+        //Listen for paste event and run _configureLiveDev()
+        var myElement = document.getElementById("first-pane");
+        myElement.onpaste = function(e) {
+            _configureLiveDev();
+
+          return true; // Allows the default handler to run.
+        };
     });
 });
