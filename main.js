@@ -17,7 +17,7 @@ define(function (require, exports, module) {
         Browser              = require("lib/iframe-browser"),
         LiveDevelopment      = brackets.getModule("LiveDevelopment/LiveDevMultiBrowser"),
         PostMessageTransport = require("lib/PostMessageTransport"),
-        Launcher             = require("lib/Launcher").Launcher,
+        Launcher             = require("lib/launcher").Launcher,
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
 
     var _server;
