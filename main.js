@@ -18,7 +18,8 @@ define(function (require, exports, module) {
         LiveDevelopment      = brackets.getModule("LiveDevelopment/LiveDevMultiBrowser"),
         PostMessageTransport = require("lib/PostMessageTransport"),
         Launcher             = require("lib/launcher").Launcher,
-        NoHostServer         = require("nohost/src/NoHostServer").NoHostServer;
+        NoHostServer         = require("nohost/src/NoHostServer").NoHostServer,
+        ExtensionUtils       = brackets.getModule("utils/ExtensionUtils");
 
     var _server;
 
@@ -65,6 +66,8 @@ define(function (require, exports, module) {
         // Flip livedev.multibrowser to true
         var prefs = PreferencesManager.getExtensionPrefs("livedev");
         prefs.set("multibrowser", true);
+
+        ExtensionUtils.loadStyleSheet(module, "tutorials.css");
 
         // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _getServer }, 9001);
