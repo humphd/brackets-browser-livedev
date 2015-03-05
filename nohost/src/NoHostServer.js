@@ -3,12 +3,13 @@
 define(function (require, exports, module) {
     "use strict";
 
-    var BaseServer  = brackets.getModule("LiveDevelopment/Servers/BaseServer").BaseServer;
+    var BaseServer = brackets.getModule("LiveDevelopment/Servers/BaseServer").BaseServer;
 
     var Content = require("nohost/src/content");
     var Handlers = require("nohost/src/handlers");
     var Rewriter = require("nohost/src/rewriter");
     var Log = require("nohost/src/log");
+    var newHTML = require("text!../../lib/newPage.html");
 
     var Filer = appshell.Filer;
     var Path = Filer.Path;
@@ -23,7 +24,12 @@ define(function (require, exports, module) {
 
     // TODO: I *think* I want to return these unmodified...
     NoHostServer.prototype.pathToUrl = function(path) {
-        return path;
+        var pathToUrl = Filer.blobs[Path.normalize(path)];
+        if(pathToUrl) {
+            return pathToUrl;
+        } else {
+            return path;
+        }
     };
     NoHostServer.prototype.urlToPath = function(url) {
         return url;
@@ -42,8 +48,15 @@ define(function (require, exports, module) {
      * instrumentation is enabled
      */
     NoHostServer.prototype.add = function (liveDocument) {
+        var id = liveDocument.doc.language.getId();
+
         if (liveDocument.setInstrumentationEnabled) {
-            // enable instrumentation
+            //If new HTML document is empty, inject defaultHTML file
+            //so live preview doesn't break
+            if(liveDocument.doc.getText() === "" && id === "html") {
+                liveDocument.doc.setText(newHTML);
+            }
+
             liveDocument.setInstrumentationEnabled(true);
         }
         BaseServer.prototype.add.call(this, liveDocument);
@@ -64,7 +77,7 @@ define(function (require, exports, module) {
 
             // If this is a dir, error
             if(stats.isDirectory()) {
-                return callback(new Error('expected file path'));
+                return callback(new Error("expected file path"));
             }
 
             // This is a file, pick the right content handler based on extension
@@ -89,7 +102,7 @@ define(function (require, exports, module) {
 
         Rewriter.rewriteHTML(html, path, fs, function(err, rewrittenHTML) {
             if(err) {
-                Log.error('unable to rewrite HTML for `' + path + '`');
+                Log.error("unable to rewrite HTML for `" + path + "`");
                 // TODO: best way to deal with error here? 500?
                 return Handlers.handle404(path, callback);
             }
@@ -113,7 +126,7 @@ define(function (require, exports, module) {
             }
 
             // Convert rewritten HTML to a Blob URL Object
-            var url = Content.toURL(html, 'text/html');
+            var url = Content.toURL(html, "text/html");
             callback(null, url);
         }
 
@@ -121,7 +134,7 @@ define(function (require, exports, module) {
         if (liveDocument && liveDocument.getResponseData) {
             Rewriter.rewriteHTML(liveDocument.getResponseData().body, path, fs, toURL);
         } else {
-            fs.readFile(path, 'utf8', toURL);
+            fs.readFile(path, "utf8", toURL);
         }
     };
 

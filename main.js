@@ -25,7 +25,7 @@ define(function (require, exports, module) {
         // Load nohost dependencies
         Browser              = require("lib/iframe-browser"),
         HideUI               = require("lib/hideUI"),
-        Launcher             = require("lib/launcher").Launcher,
+        Launcher             = require("lib/launcher"),
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer,
         ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
         PostMessageTransport = require("lib/PostMessageTransport");
@@ -234,6 +234,10 @@ define(function (require, exports, module) {
                 fn: data.fn,
                 value: typeof value !== "object" ? value : undefined
             }), "*");
+        });
+        //Reload iFrame on fileSave event
+        EditorManager.on("fileSave", function() {
+            PostMessageTransport.reload();
         });
     });
 
