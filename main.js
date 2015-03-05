@@ -122,6 +122,10 @@ define(function (require, exports, module) {
         // When the app is loaded and ready, hide the menus/toolbars
         HideUI.hide();
 
+        parentWindow.postMessage(JSON.stringify({
+            type: "bramble:loaded"
+        }), "*");
+
         // Once the app has loaded our file,
         // and we can be confident the editor is open,
         // get a reference to it and attach our "onchange"
@@ -141,10 +145,10 @@ define(function (require, exports, module) {
         });
     });
 
-    // Eventually, we'll listen for a message from
-    // thimble containing the make's initial code.
-    // For now, we are defaulting to thimble's starter
-    // make.
+    // We listen for a message from Thimble containing
+    // the make's initial code.
+    // For now, we have a default html make for testing
+    // with just Brackets.
     exports.initExtension = function() {
         var deferred = new $.Deferred();
         var data;
@@ -171,8 +175,8 @@ define(function (require, exports, module) {
             if (data.type !== "bramble:init") {
                 return;
             }
-
             window.removeEventListener("message", _getInitialDocument);
+            
             window.addEventListener("message", _buttonListener);
             
             fs.writeFile(
