@@ -1,6 +1,6 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4,
 maxerr: 50, browser: true */
-/*global define, brackets */
+/*global define, brackets, appshell */
 
 /**
  * This extension provides in-editor livepreview through an iframe,
@@ -34,7 +34,7 @@ define(function (require, exports, module) {
         parentWindow = window.parent,
         params       = new UrlParams();
 
-    // Load initial document 
+    // Load initial document
     var defaultHTML = require("text!lib/default.html");
 
     // Force entry to if statments on line 262 of brackets.js to create
@@ -176,9 +176,9 @@ define(function (require, exports, module) {
                 return;
             }
             window.removeEventListener("message", _getInitialDocument);
-            
+
             window.addEventListener("message", _buttonListener);
-            
+
             fs.writeFile(
                 '/index.html',
                 data.source ? data.source : defaultHTML,
@@ -192,7 +192,7 @@ define(function (require, exports, module) {
                 }
             );
         }
-        
+
         window.addEventListener("message", _getInitialDocument);
 
         // Signal to thimble that we're waiting for the
