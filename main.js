@@ -26,6 +26,7 @@ define(function (require, exports, module) {
         HideUI               = require("lib/hideUI"),
         Launcher             = require("lib/launcher").Launcher,
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer,
+        ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
         PostMessageTransport = require("lib/PostMessageTransport");
 
     var _server,
@@ -113,6 +114,8 @@ define(function (require, exports, module) {
         // Flip livedev.multibrowser to true
         var prefs = PreferencesManager.getExtensionPrefs("livedev");
         prefs.set("multibrowser", true);
+
+        ExtensionUtils.loadStyleSheet(module, "stylesheets/tutorials.css");
 
         // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _getServer }, 9001);
