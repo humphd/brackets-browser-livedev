@@ -26,6 +26,7 @@ define(function (require, exports, module) {
         HideUI               = require("lib/hideUI"),
         Launcher             = require("lib/launcher").Launcher,
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer,
+        ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
         PostMessageTransport = require("lib/PostMessageTransport");
 
     var _server,
@@ -50,6 +51,31 @@ define(function (require, exports, module) {
             });
         }
         return _server;
+    }
+
+    function parseData(data, deferred) {
+        var dataReceived = data;
+
+        try {
+            data = dataReceived || null;
+            data = JSON.parse(data);
+            data = data || {};
+        } catch(err) {
+            // Quick fix: Ignore the 'process-tick' message being sent
+            if(dataReceived === 'process-tick') {
+                return false;
+            }
+
+            console.error("Parsing message from thimble failed: ", err);
+
+            if(deferred) {
+                deferred.reject();
+            }
+
+            return false;
+        }
+
+        return data;
     }
 
     // We wait until the LiveDevelopment module is initialized and the project loaded
@@ -114,6 +140,8 @@ define(function (require, exports, module) {
         var prefs = PreferencesManager.getExtensionPrefs("livedev");
         prefs.set("multibrowser", true);
 
+        ExtensionUtils.loadStyleSheet(module, "stylesheets/tutorials.css");
+
         // Register nohost server with highest priority
         LiveDevServerManager.registerServer({ create: _getServer }, 9001);
     });
@@ -134,13 +162,73 @@ define(function (require, exports, module) {
 
         parentWindow.postMessage(JSON.stringify({
             type: "bramble:change",
-            sourceCode: codeMirror.getValue()
+            sourceCode: codeMirror.getValue(),
+            lastLine: codeMirror.lastLine(),
+            scrollInfo: codeMirror.getScrollInfo()
         }), "*");
 
-        codeMirror.on("change", function(e){
+        codeMirror.on("change", function(){
             parentWindow.postMessage(JSON.stringify({
                 type: "bramble:change",
-                sourceCode: codeMirror.getValue()
+                sourceCode: codeMirror.getValue(),
+                lastLine: codeMirror.lastLine()
+            }), "*");
+        });
+
+        codeMirror.on("viewportChange", function() {
+            parentWindow.postMessage(JSON.stringify({
+                type: "bramble:viewportChange",
+                scrollInfo: codeMirror.getScrollInfo()
+            }), "*");
+        });
+
+        window.addEventListener("message", function(e) {
+            var data = parseData(e.data);
+            var value;
+            var mark;
+
+            if(!data) {
+                return;
+            }
+
+            if(data.type !== "bramble:edit") {
+                return;
+            }
+
+            if(!data.fn) {
+                console.error("No edit function sent from thimble to call on code mirror");
+                return;
+            }
+
+
+            // QuickFix: Hack to create a DOM element as a marker since it cannot
+            // be passed in through postMessage as JSON's stringify cannot work for
+            // DOM elements (because it has circular references)
+            if(data.fn === "setGutterMarker" && data.params[2]) {
+                mark = document.createElement(data.params[2].name);
+                var attributes = data.params[2].attributes;
+                Object.keys(attributes).forEach(function(attrName) {
+                    $(mark).attr(attrName, attributes[attrName]);
+                });
+                mark.innerHTML = data.params[2].innerHTML;
+                data.params[2] = mark;
+            }
+
+            if(data.fn === "getLineHeight") {
+                var codeMirrorLine = document.querySelector(data.params[0]);
+                value = parseFloat(window.getComputedStyle(codeMirrorLine).height);
+            } else {
+                value = codeMirror[data.fn].apply(codeMirror, data.params);
+            }
+
+            if(value === undefined || value === null) {
+                return;
+            }
+
+            parentWindow.postMessage(JSON.stringify({
+                type: "bramble:edit",
+                fn: data.fn,
+                value: typeof value !== "object" ? value : undefined
             }), "*");
         });
     });
@@ -151,30 +239,16 @@ define(function (require, exports, module) {
     // with just Brackets.
     exports.initExtension = function() {
         var deferred = new $.Deferred();
-        var data;
 
         function _getInitialDocument(e) {
-            try {
-                data = e.data || null;
-                data = JSON.parse(data);
-                data = data || {};
-            } catch(err) {
-                // Quick fix: Ignore the 'process-tick' message being sent
-                if(e.data === 'process-tick') {
-                    return;
-                }
-
-                console.error("Parsing message from thimble failed: ", err);
-
-                deferred.reject();
-                return;
-            }
+            var data = parseData(e.data, deferred);
 
             // Remove the listener after we confirm the event is the
             // one we're waiting for
-            if (data.type !== "bramble:init") {
+            if (!data || data.type !== "bramble:init") {
                 return;
             }
+
             window.removeEventListener("message", _getInitialDocument);
 
             window.addEventListener("message", _buttonListener);
