@@ -21,6 +21,7 @@ define(function (require, exports, module) {
         LiveDevelopment      = brackets.getModule("LiveDevelopment/LiveDevMultiBrowser"),
         UrlParams            = brackets.getModule("utils/UrlParams").UrlParams,
         ViewCommand          = brackets.getModule("view/ViewCommandHandlers"),
+        Editor               = brackets.getModule("editor/Editor").Editor,
         // Load nohost dependencies
         Browser              = require("lib/iframe-browser"),
         HideUI               = require("lib/hideUI"),
@@ -109,13 +110,13 @@ define(function (require, exports, module) {
      * some of these being:
      * undo, redo, size changer, or any other buttons relating to menu or view
      * within event we expect to receive a JSONable object that contains a commandCategory:
-     * menuCommand: "Menu Command" relating to menu commands runable, and
+     * menuCommand: "Menu Command" relating to menu commands runable
      * viewCommand: "View Command" relating to functions in viewcommand
+     * editorCommand: "Editor Command" relating to functions relating ot the editor itself
      * also contains a variable of "params" which can be used to send further information needed
      */
     function _buttonListener(event) {
         var msgObj;
-
         try {
             msgObj = JSON.parse(event.data);
         } catch (e) {
@@ -128,6 +129,9 @@ define(function (require, exports, module) {
         }
         else if (msgObj.commandCategory === "viewCommand") {
             ViewCommand[msgObj.command](msgObj.params);
+        }
+        else if (msgObj.commandCategory === "editorCommand") {
+            Editor[msgObj.command](msgObj.params);
         }
     }
 
