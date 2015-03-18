@@ -158,6 +158,10 @@ define(function (require, exports, module) {
             type: "bramble:loaded"
         }), "*");
 
+        //Below are methods to change the preferences of breackets, more available at:
+        // https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#list-of-supported-preferences
+        PreferencesManager.set("insertHintOnTab", true);
+
         // Once the app has loaded our file,
         // and we can be confident the editor is open,
         // get a reference to it and attach our "onchange"
