@@ -158,9 +158,14 @@ define(function (require, exports, module) {
             type: "bramble:loaded"
         }), "*");
 
-        //Below are methods to change the preferences of breackets, more available at:
+        // Below are methods to change the preferences of brackets, more available at:
         // https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#list-of-supported-preferences
         PreferencesManager.set("insertHintOnTab", true);
+        // Make the spaceUnits and tabSize consistent 
+        PreferencesManager.set("spaceUnits", 2);
+        PreferencesManager.set("tabSize", 2);
+        // Allows the closeTags to indent consistently
+        PreferencesManager.set("closeTags", true);
 
         // Once the app has loaded our file,
         // and we can be confident the editor is open,
