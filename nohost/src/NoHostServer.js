@@ -1,16 +1,16 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, brackets, appshell */
+/*global define, brackets */
 define(function (require, exports, module) {
     "use strict";
 
     var BaseServer  = brackets.getModule("LiveDevelopment/Servers/BaseServer").BaseServer;
+    var Filer = brackets.getModule("filesystem/impls/filer/BracketsFiler");
 
     var Content = require("nohost/src/content");
     var Handlers = require("nohost/src/handlers");
     var Rewriter = require("nohost/src/rewriter");
     var Log = require("nohost/src/log");
 
-    var Filer = appshell.Filer;
     var Path = Filer.Path;
 
     function NoHostServer(config) {
