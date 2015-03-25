@@ -1,6 +1,6 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, indent: 4,
 maxerr: 50, browser: true */
-/*global define, brackets, appshell */
+/*global define, brackets */
 
 /**
  * This extension provides in-editor livepreview through an iframe,
@@ -28,11 +28,12 @@ define(function (require, exports, module) {
         Launcher             = require("lib/launcher").Launcher,
         NoHostServer         = require("nohost/src/NoHostServer").NoHostServer,
         ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
-        PostMessageTransport = require("lib/PostMessageTransport");
+        PostMessageTransport = require("lib/PostMessageTransport"),
+        Filer                = brackets.getModule("filesystem/impls/filer/BracketsFiler");
 
     var _server,
         codeMirror,
-        fs           = appshell.Filer.fs(),
+        fs           = Filer.fs(),
         parentWindow = window.parent,
         params       = new UrlParams();
 
@@ -161,7 +162,7 @@ define(function (require, exports, module) {
         // Below are methods to change the preferences of brackets, more available at:
         // https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#list-of-supported-preferences
         PreferencesManager.set("insertHintOnTab", true);
-        // Make the spaceUnits and tabSize consistent 
+        // Make the spaceUnits and tabSize consistent
         PreferencesManager.set("spaceUnits", 2);
         PreferencesManager.set("tabSize", 2);
         // Allows the closeTags to indent consistently

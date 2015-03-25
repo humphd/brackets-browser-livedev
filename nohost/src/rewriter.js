@@ -1,13 +1,14 @@
 /*jslint vars: true, plusplus: true, devel: true, nomen: true, regexp: true, indent: 4, maxerr: 50 */
-/*global define, brackets, appshell, DOMParser */
+/*global define, brackets, DOMParser */
 define(function (require, exports, module) {
     "use strict";
+
+    var Filer = brackets.getModule("filesystem/impls/filer/BracketsFiler");
 
     var Content = require("nohost/src/content");
     var Log = require("nohost/src/log");
     var Async = require("nohost/lib/async");
 
-    var Filer = appshell.Filer;
     var Path = Filer.Path;
 
     /**
