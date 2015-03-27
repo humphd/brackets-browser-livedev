@@ -156,6 +156,9 @@ define(function (require, exports, module) {
         else if (msgObj.commandCategory === "editorCommand") {
             Editor[msgObj.command](msgObj.params);
         }
+        else if (msgObj.commandCategory === "reloadCommand") {
+            PostMessageTransport.reload();
+        }
     }
 
     // We configure Brackets to run the experimental live dev
