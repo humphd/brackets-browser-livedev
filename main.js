@@ -124,7 +124,7 @@ define(function (require, exports, module) {
      * undo, redo, size changer, or any other buttons relating to menu or view
      * within event we expect to receive a JSONable object that contains a commandCategory:
      * menuCommand: "Menu Command" relating to menu commands runable
-     * viewCommand: "View Command" relating to functions in viewcommand
+     * fontChange: refers to a method we use to change fonts size
      * editorCommand: "Editor Command" relating to functions relating ot the editor itself
      * also contains a variable of "params" which can be used to send further information needed
      */
@@ -140,11 +140,24 @@ define(function (require, exports, module) {
             codeMirror.focus();
             CommandManager.execute(Commands[msgObj.command]);
         }
-        else if (msgObj.commandCategory === "viewCommand") {
-            ViewCommand[msgObj.command](msgObj.params);
+        else if (msgObj.commandCategory === "fontChange") {
+            CommandManager.execute(Commands[msgObj.Command]);
+            if(msgObj.params < "12") {
+                for(var i = 12; i > msgObj.params; i--) {
+                    CommandManager.execute(Commands["VIEW_DECREASE_FONT_SIZE"]);
+                }
+            }
+            else if(msgObj.params > "12") {
+                for(var i = 12; i < msgObj.params; i++) {
+                    CommandManager.execute(Commands["VIEW_INCREASE_FONT_SIZE"]);
+                }
+            }
         }
         else if (msgObj.commandCategory === "editorCommand") {
             Editor[msgObj.command](msgObj.params);
+        }
+        else if (msgObj.commandCategory === "reloadCommand") {
+            PostMessageTransport.reload();
         }
     }
 
