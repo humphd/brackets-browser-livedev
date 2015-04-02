@@ -20,7 +20,6 @@ define(function (require, exports, module) {
         ProjectManager       = brackets.getModule("project/ProjectManager"),
         LiveDevelopment      = brackets.getModule("LiveDevelopment/LiveDevMultiBrowser"),
         UrlParams            = brackets.getModule("utils/UrlParams").UrlParams,
-        ViewCommand          = brackets.getModule("view/ViewCommandHandlers"),
         Editor               = brackets.getModule("editor/Editor").Editor,
         // Load nohost dependencies
         Browser              = require("lib/iframe-browser"),
@@ -130,6 +129,7 @@ define(function (require, exports, module) {
      */
     function _buttonListener(event) {
         var msgObj;
+        var i;
         try {
             msgObj = JSON.parse(event.data);
         } catch (e) {
@@ -143,13 +143,13 @@ define(function (require, exports, module) {
         else if (msgObj.commandCategory === "fontChange") {
             CommandManager.execute(Commands[msgObj.Command]);
             if(msgObj.params < "12") {
-                for(var i = 12; i > msgObj.params; i--) {
-                    CommandManager.execute(Commands["VIEW_DECREASE_FONT_SIZE"]);
+                for(i = 12; i > msgObj.params; i--) {
+                    CommandManager.execute(Commands.VIEW_DECREASE_FONT_SIZE);
                 }
             }
             else if(msgObj.params > "12") {
-                for(var i = 12; i < msgObj.params; i++) {
-                    CommandManager.execute(Commands["VIEW_INCREASE_FONT_SIZE"]);
+                for(i = 12; i < msgObj.params; i++) {
+                    CommandManager.execute(Commands.VIEW_INCREASE_FONT_SIZE);
                 }
             }
         }
