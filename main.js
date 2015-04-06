@@ -141,7 +141,7 @@ define(function (require, exports, module) {
             CommandManager.execute(Commands[msgObj.command]);
         }
         else if (msgObj.commandCategory === "fontChange") {
-            CommandManager.execute(Commands[msgObj.Command]);
+            CommandManager.execute(Commands[msgObj.command]);
             if(msgObj.params < "12") {
                 for(i = 12; i > msgObj.params; i--) {
                     CommandManager.execute(Commands.VIEW_DECREASE_FONT_SIZE);
