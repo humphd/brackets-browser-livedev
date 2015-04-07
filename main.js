@@ -38,7 +38,7 @@ define(function (require, exports, module) {
         params       = new UrlParams();
 
     // Load initial document
-    var defaultHTML = require("text!/src/filesystem/impls/lib/default.html");
+    var defaultHTML = require("text!/src/filesystem/impls/filer/lib/default.html");
 
     // Force entry to if statments on line 262 of brackets.js to create
     // a new project
