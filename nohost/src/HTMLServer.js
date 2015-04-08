@@ -7,7 +7,6 @@ define(function (require, exports, module) {
         LiveDevelopmentUtils    = brackets.getModule("LiveDevelopment/LiveDevelopmentUtils"),
         BlobUtils               = brackets.getModule("filesystem/impls/filer/BlobUtils"),
         Filer                   = brackets.getModule("filesystem/impls/filer/BracketsFiler"),
-        Content                 = brackets.getModule("filesystem/impls/filer/lib/content"),
         Rewriter                = brackets.getModule("filesystem/impls/filer/lib/HTMLRewriter");
 
     function HTMLServer(config) {
@@ -77,7 +76,7 @@ define(function (require, exports, module) {
         var path = BlobUtils.getFilename(url);
         var liveDocument = this._liveDocuments[path];
 
-        return Content.toURL(Rewriter.rewrite(path, liveDocument.getResponseData().body), "text/html");
+        return BlobUtils.createURL(path, Rewriter.rewrite(path, liveDocument.getResponseData().body), "text/html");
     };
 
     exports.HTMLServer = HTMLServer;
