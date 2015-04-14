@@ -23,7 +23,7 @@ define(function (require, exports, module) {
         Editor               = brackets.getModule("editor/Editor").Editor,
         // Load nohost dependencies
         Browser              = require("lib/iframe-browser"),
-        HideUI               = require("lib/hideUI"),
+        UI                   = require("lib/UI"),
         Launcher             = require("lib/launcher"),
         HTMLServer           = require("nohost/src/HTMLServer").HTMLServer,
         StaticServer         = require("nohost/src/StaticServer").StaticServer,
@@ -179,7 +179,7 @@ define(function (require, exports, module) {
 
     AppInit.appReady(function (){
         // When the app is loaded and ready, hide the menus/toolbars
-        HideUI.hide();
+        UI.initUI();
 
         parentWindow.postMessage(JSON.stringify({
             type: "bramble:loaded"
