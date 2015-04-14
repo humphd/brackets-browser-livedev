@@ -1,0 +1,7 @@
+#liveDevButton {
+	width: 25px;
+	height: 25px;
+	background-image: url("../lib/LivePreviewButton.png");
+	background-size: contain;
+	display: block;
+}
