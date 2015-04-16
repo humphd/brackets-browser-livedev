@@ -100,3 +100,7 @@
 	background-size: contain;
 	display: block;
 }
+
+.expandEditor {
+	width: 100% !important;
+}
