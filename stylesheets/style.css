@@ -89,3 +89,7 @@
     background: #FFF none repeat scroll 0% 0%;
     height: 100%;
 }
+
+.second-pane-scroll {
+    overflow: scroll !important;
+}
