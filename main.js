@@ -31,6 +31,8 @@ define(function (require, exports, module) {
         PostMessageTransport = require("lib/PostMessageTransport"),
         FileSystem           = brackets.getModule("filesystem/FileSystem");
 
+    ExtensionUtils.loadStyleSheet(module, "stylesheets/style.css");
+
     var _HTMLServer,
         _staticServer,
         codeMirror,
