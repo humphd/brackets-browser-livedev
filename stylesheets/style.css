@@ -92,6 +92,7 @@
 
 .second-pane-scroll {
     overflow: scroll !important;
+}
 
 #liveDevButton {
 	width: 25px;
