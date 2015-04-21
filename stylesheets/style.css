@@ -93,3 +93,21 @@
 .second-pane-scroll {
     overflow: scroll !important;
 }
+
+#liveDevButton {
+	width: 25px;
+	height: 25px;
+	background-size: contain;
+	display: block;
+}
+
+.liveDevButtonDetach {
+	background-image: url("../lib/appbar.new.window.svg");
+}
+.liveDevButtonAttach {
+	background-image: url("../lib/appbar.fullscreen.box.svg");
+}
+
+.expandEditor {
+	width: 100% !important;
+}
