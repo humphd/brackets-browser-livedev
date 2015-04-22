@@ -21,6 +21,7 @@ define(function (require, exports, module) {
         LiveDevelopment      = brackets.getModule("LiveDevelopment/LiveDevMultiBrowser"),
         UrlParams            = brackets.getModule("utils/UrlParams").UrlParams,
         Editor               = brackets.getModule("editor/Editor").Editor,
+        Rewriter             = brackets.getModule("filesystem/impls/filer/lib/HTMLRewriter"),
         // Load nohost dependencies
         Browser              = require("lib/iframe-browser"),
         UI                   = require("lib/UI"),
@@ -161,6 +162,15 @@ define(function (require, exports, module) {
             Editor[msgObj.command](msgObj.params);
         }
         else if (msgObj.commandCategory === "reloadCommand") {
+            PostMessageTransport.reload();
+        }
+        else if (msgObj.commandCategory === "runJavascript") {
+            if(msgObj.command) {
+                Rewriter.enableScripts();
+            }
+            else {
+                Rewriter.disableScripts();
+            }
             PostMessageTransport.reload();
         }
     }
