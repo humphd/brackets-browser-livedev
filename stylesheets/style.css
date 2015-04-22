@@ -1,3 +1,4 @@
+/* Statusbar buttons start */
 .mobileButton {
     width: 25px;
     height: 25px;
@@ -14,6 +15,30 @@
     display: block;
 }
 
+#liveDevButton {
+    width: 25px;
+    height: 25px;
+    background-size: contain;
+    display: block;
+}
+
+.liveDevButtonDetach {
+    background-image: url("../lib/appbar.new.window.svg");
+}
+.liveDevButtonAttach {
+    background-image: url("../lib/appbar.fullscreen.box.svg");
+}
+
+.second-pane-scroll {
+    overflow: scroll !important;
+}
+
+.expandEditor {
+    width: 100% !important;
+}
+/* Statusbar buttons end */
+
+/* Mobile view start */
 .phone-container {
     margin: 0px auto;
     margin-top: 30px;
@@ -89,25 +114,29 @@
     background: #FFF none repeat scroll 0% 0%;
     height: 100%;
 }
+/* Mobile view end */
 
-.second-pane-scroll {
-    overflow: scroll !important;
-}
-
-#liveDevButton {
-	width: 25px;
-	height: 25px;
-	background-size: contain;
-	display: block;
+/* Hide UI start */
+.hideLeftToolbar {
+    visibility: hidden;
 }
 
-.liveDevButtonDetach {
-	background-image: url("../lib/appbar.new.window.svg");
-}
-.liveDevButtonAttach {
-	background-image: url("../lib/appbar.fullscreen.box.svg");
+.editor-holder-height {
+    height: 96%;
 }
 
-.expandEditor {
-	width: 100% !important;
+.first-pane-height {
+    height: 100%;
 }
+
+.hideRightToolbar {
+    right: 0 !important;
+}
+/* Hide UI end */
+
+/* Iframe start */
+.iframeWidthHeight {
+    width: 100%;
+    height: 100%;
+}
+/* Iframe end */
