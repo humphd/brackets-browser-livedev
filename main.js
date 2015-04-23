@@ -42,7 +42,7 @@ define(function (require, exports, module) {
     // Load initial document
     var defaultHTML = brackets.getModule("text!filesystem/impls/filer/lib/default.html");
     var defaultCSS  = require("text!lib/default-files/style.css");
-    var defaultJS   = require("text!lib/default-files/script.js");
+    var defaultJS   = require("text!lib/default-files/script.txt");
 
     // Force entry to if statments on line 262 of brackets.js to create
     // a new project
