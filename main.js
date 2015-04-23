@@ -41,6 +41,8 @@ define(function (require, exports, module) {
 
     // Load initial document
     var defaultHTML = brackets.getModule("text!filesystem/impls/filer/lib/default.html");
+    var defaultCSS  = require("text!lib/default-files/style.css");
+    var defaultJS   = require("text!lib/default-files/script.js");
 
     // Force entry to if statments on line 262 of brackets.js to create
     // a new project
@@ -295,9 +297,12 @@ define(function (require, exports, module) {
 
             window.addEventListener("message", _buttonListener);
 
-            var file = FileSystem.getFileForPath("/index.html");
+            var fileHTML = FileSystem.getFileForPath("/index.html");
+            var fileCSS  = FileSystem.getFileForPath("/style.css");
+            var fileJS   = FileSystem.getFileForPath("/script.js");
 
-            file.write(data.source ? data.source : defaultHTML,
+            // Write the HTML file and block on it being done.
+            fileHTML.write(data.source ? data.source : defaultHTML,
                 function(err) {
                     if (err) {
                         deferred.reject();
@@ -307,6 +312,20 @@ define(function (require, exports, module) {
                     deferred.resolve();
                 }
             );
+
+            // Write the CSS and JS file without blocking.
+            fileCSS.write(defaultCSS, function(err) {
+                if (err) {
+                    console.error("Couldn't write /style.css");
+                    return;
+                }
+
+                fileJS.write(defaultJS, function(err) {
+                    if (err) {
+                        console.error("Couldn't write /script.js");
+                    }
+                });
+            });
         }
 
         window.addEventListener("message", _getInitialDocument);
