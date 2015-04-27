@@ -30,7 +30,10 @@ define(function (require, exports, module) {
         StaticServer         = require("nohost/src/StaticServer").StaticServer,
         ExtensionUtils       = brackets.getModule("utils/ExtensionUtils"),
         PostMessageTransport = require("lib/PostMessageTransport"),
-        FileSystem           = brackets.getModule("filesystem/FileSystem");
+        FileSystem           = brackets.getModule("filesystem/FileSystem"),
+        Path                 = brackets.getModule("filesystem/impls/filer/BracketsFiler").Path,
+        BlobUtils            = brackets.getModule("filesystem/impls/filer/BlobUtils"),
+        XHRHandler           = require("lib/xhr/XHRHandler");
 
     ExtensionUtils.loadStyleSheet(module, "stylesheets/style.css");
 
@@ -95,6 +98,20 @@ define(function (require, exports, module) {
         }
 
         return data;
+    }
+
+    function handleMessage(message) {
+        var currentDocPath = BlobUtils.getFilename(Browser.getBrowserIframe().src);
+
+        try {
+            message = parseData(message);
+        } catch(ex) {
+            return;
+        }
+
+        if(message.method === "XMLHttpRequest") {
+            XHRHandler.handleRequest(Path.resolve(currentDocPath, message.path));
+        }
     }
 
     // We wait until the LiveDevelopment module is initialized and the project loaded
@@ -240,12 +257,20 @@ define(function (require, exports, module) {
             var data = parseData(e.data);
             var value;
             var mark;
+            var type;
 
             if(!data) {
                 return;
             }
 
-            if(data.type !== "bramble:edit") {
+            type = data.type;
+
+            if(type === "message") {
+                handleMessage(data.message);
+                return;
+            }
+
+            if(type !== "bramble:edit") {
                 return;
             }
 
