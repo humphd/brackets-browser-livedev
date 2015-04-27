@@ -101,16 +101,21 @@ define(function (require, exports, module) {
     }
 
     function handleMessage(message) {
-        var currentDocPath = BlobUtils.getFilename(Browser.getBrowserIframe().src);
+        var currentDocUrl = Browser.getBrowserIframe().src;
+        var currentDocPath = BlobUtils.getFilename(currentDocUrl);
+        var currentDir = currentDocPath !== currentDocUrl ? Path.dirname(currentDocPath) : currentDocPath;
+        var requestedPath;
 
         try {
             message = parseData(message);
         } catch(ex) {
+            console.error("[Brackets Browser LiveDev Error] Cannot handle message ", message);
             return;
         }
 
         if(message.method === "XMLHttpRequest") {
-            XHRHandler.handleRequest(Path.resolve(currentDocPath, message.path));
+            requestedPath = Path.resolve(currentDir, Path.normalize(message.path));
+            XHRHandler.handleRequest(requestedPath);
         }
     }
 
