@@ -7,7 +7,9 @@ define(function (require, exports, module) {
         LiveDevelopmentUtils    = brackets.getModule("LiveDevelopment/LiveDevelopmentUtils"),
         BlobUtils               = brackets.getModule("filesystem/impls/filer/BlobUtils"),
         Filer                   = brackets.getModule("filesystem/impls/filer/BracketsFiler"),
-        Rewriter                = brackets.getModule("filesystem/impls/filer/lib/HTMLRewriter");
+        Rewriter                = brackets.getModule("filesystem/impls/filer/lib/HTMLRewriter"),
+        Compatibility           = require("lib/compatibility"),
+        _shouldUseBlobURL;
 
     function HTMLServer(config) {
         config = config || {};
@@ -32,6 +34,24 @@ define(function (require, exports, module) {
 
     HTMLServer.prototype.stop = function() {
         this.fs = null;
+    };
+
+    HTMLServer.prototype.readyToServe = function () {
+        var self = this;
+        var deferred = new $.Deferred();
+
+        // Decide if we can use Blob URLs or need to document.write()
+        Compatibility.supportsIFrameHTMLBlobURL(function(err, shouldUseBlobURL) {
+            if(err) {
+                console.error("[Brackets HTMLServer] Unexpected error:", err);
+                deferred.reject();
+            }
+
+            _shouldUseBlobURL = shouldUseBlobURL;
+            deferred.resolve();
+        });
+
+        return deferred.promise();
     };
 
     /**
@@ -69,14 +89,15 @@ define(function (require, exports, module) {
     };
 
     /**
-     * If a livedoc exists, serves the instrumented version of the file as as a blob URL.
-     * Otherwise, it serves only the file's contents as a blob URL.
+     * If a livedoc exists, serves the instrumented version of the file.
+     * We either serve raw HTML or a Blob URL depending on browser compatibility.
      */
     HTMLServer.prototype.serveLiveDoc = function(url) {
         var path = BlobUtils.getFilename(url);
         var liveDocument = this._liveDocuments[path];
+        var html = Rewriter.rewrite(path, liveDocument.getResponseData().body);
 
-        return BlobUtils.createURL(path, Rewriter.rewrite(path, liveDocument.getResponseData().body), "text/html");
+        return _shouldUseBlobURL ? BlobUtils.createURL(path, html, "text/html") : html;
     };
 
     exports.HTMLServer = HTMLServer;
