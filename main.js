@@ -214,107 +214,109 @@ define(function (require, exports, module) {
     });
 
     AppInit.appReady(function (){
-        // When the app is loaded and ready, hide the menus/toolbars
-        UI.initUI();
+        function attachListeners() {
+            parentWindow.postMessage(JSON.stringify({
+                type: "bramble:loaded"
+            }), "*");
 
-        parentWindow.postMessage(JSON.stringify({
-            type: "bramble:loaded"
-        }), "*");
+            // Below are methods to change the preferences of brackets, more available at:
+            // https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#list-of-supported-preferences
+            PreferencesManager.set("insertHintOnTab", true);
+            // Make the spaceUnits and tabSize consistent
+            PreferencesManager.set("spaceUnits", 2);
+            PreferencesManager.set("tabSize", 2);
+            // Allows the closeTags to indent consistently
+            PreferencesManager.set("closeTags", true);
 
-        // Below are methods to change the preferences of brackets, more available at:
-        // https://github.com/adobe/brackets/wiki/How-to-Use-Brackets#list-of-supported-preferences
-        PreferencesManager.set("insertHintOnTab", true);
-        // Make the spaceUnits and tabSize consistent
-        PreferencesManager.set("spaceUnits", 2);
-        PreferencesManager.set("tabSize", 2);
-        // Allows the closeTags to indent consistently
-        PreferencesManager.set("closeTags", true);
+            // Once the app has loaded our file,
+            // and we can be confident the editor is open,
+            // get a reference to it and attach our "onchange"
+            // listener to codemirror
+            codeMirror = EditorManager.getActiveEditor()._codeMirror;
 
-        // Once the app has loaded our file,
-        // and we can be confident the editor is open,
-        // get a reference to it and attach our "onchange"
-        // listener to codemirror
-        codeMirror = EditorManager.getActiveEditor()._codeMirror;
-
-        parentWindow.postMessage(JSON.stringify({
-            type: "bramble:change",
-            sourceCode: codeMirror.getValue(),
-            lastLine: codeMirror.lastLine(),
-            scrollInfo: codeMirror.getScrollInfo()
-        }), "*");
-
-        codeMirror.on("change", function(){
             parentWindow.postMessage(JSON.stringify({
                 type: "bramble:change",
                 sourceCode: codeMirror.getValue(),
-                lastLine: codeMirror.lastLine()
-            }), "*");
-        });
-
-        codeMirror.on("viewportChange", function() {
-            parentWindow.postMessage(JSON.stringify({
-                type: "bramble:viewportChange",
+                lastLine: codeMirror.lastLine(),
                 scrollInfo: codeMirror.getScrollInfo()
             }), "*");
-        });
 
-        window.addEventListener("message", function(e) {
-            var data = parseData(e.data);
-            var value;
-            var mark;
-            var type;
+            codeMirror.on("change", function(){
+                parentWindow.postMessage(JSON.stringify({
+                    type: "bramble:change",
+                    sourceCode: codeMirror.getValue(),
+                    lastLine: codeMirror.lastLine()
+                }), "*");
+            });
 
-            if(!data) {
-                return;
-            }
+            codeMirror.on("viewportChange", function() {
+                parentWindow.postMessage(JSON.stringify({
+                    type: "bramble:viewportChange",
+                    scrollInfo: codeMirror.getScrollInfo()
+                }), "*");
+            });
 
-            type = data.type;
+            window.addEventListener("message", function(e) {
+                var data = parseData(e.data);
+                var value;
+                var mark;
+                var type;
 
-            if(type === "message") {
-                handleMessage(data.message);
-                return;
-            }
+                if(!data) {
+                    return;
+                }
 
-            if(type !== "bramble:edit") {
-                return;
-            }
+                type = data.type;
 
-            if(!data.fn) {
-                console.error("No edit function sent from thimble to call on code mirror");
-                return;
-            }
+                if(type === "message") {
+                    handleMessage(data.message);
+                    return;
+                }
+
+                if(type !== "bramble:edit") {
+                    return;
+                }
+
+                if(!data.fn) {
+                    console.error("No edit function sent from thimble to call on code mirror");
+                    return;
+                }
 
 
-            // QuickFix: Hack to create a DOM element as a marker since it cannot
-            // be passed in through postMessage as JSON's stringify cannot work for
-            // DOM elements (because it has circular references)
-            if(data.fn === "setGutterMarker" && data.params[2]) {
-                mark = document.createElement(data.params[2].name);
-                var attributes = data.params[2].attributes;
-                Object.keys(attributes).forEach(function(attrName) {
-                    $(mark).attr(attrName, attributes[attrName]);
-                });
-                mark.innerHTML = data.params[2].innerHTML;
-                data.params[2] = mark;
-            }
+                // QuickFix: Hack to create a DOM element as a marker since it cannot
+                // be passed in through postMessage as JSON's stringify cannot work for
+                // DOM elements (because it has circular references)
+                if(data.fn === "setGutterMarker" && data.params[2]) {
+                    mark = document.createElement(data.params[2].name);
+                    var attributes = data.params[2].attributes;
+                    Object.keys(attributes).forEach(function(attrName) {
+                        $(mark).attr(attrName, attributes[attrName]);
+                    });
+                    mark.innerHTML = data.params[2].innerHTML;
+                    data.params[2] = mark;
+                }
 
-            if(data.fn === "getLineHeight") {
-                var codeMirrorLine = document.querySelector(data.params[0]);
-                value = parseFloat(window.getComputedStyle(codeMirrorLine).height);
-            } else {
-                value = codeMirror[data.fn].apply(codeMirror, data.params);
-            }
+                if(data.fn === "getLineHeight") {
+                    var codeMirrorLine = document.querySelector(data.params[0]);
+                    value = parseFloat(window.getComputedStyle(codeMirrorLine).height);
+                } else {
+                    value = codeMirror[data.fn].apply(codeMirror, data.params);
+                }
 
-            if(value === undefined || value === null) {
-                return;
-            }
+                if(value === undefined || value === null) {
+                    return;
+                }
 
-            parentWindow.postMessage(JSON.stringify({
-                type: "bramble:edit",
-                fn: data.fn,
-                value: typeof value !== "object" ? value : undefined
-            }), "*");
-        });
+                parentWindow.postMessage(JSON.stringify({
+                    type: "bramble:edit",
+                    fn: data.fn,
+                    value: typeof value !== "object" ? value : undefined
+                }), "*");
+            });
+        }
+
+        // When the app is loaded and ready, hide the menus/toolbars
+        UI.initUI(attachListeners);
     });
 
     // We listen for a message from Thimble containing
